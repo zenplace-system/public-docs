@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vercel Enterpriseプラン コスト構造と権限モデル</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kaisei+Decol&family=Yomogi&family=Zen+Kurenaido&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --vercel-black: #000000;
+      --vercel-white: #FFFFFF;
+      --vercel-gray-100: #F5F5F5;
+      --vercel-gray-200: #EAEAEA;
+      --vercel-gray-300: #999999;
+      --vercel-gray-400: #666666;
+      --vercel-gray-500: #444444;
+      --vercel-blue-100: #D6E4FF;
+      --vercel-blue-300: #4B9FFF;
+      --vercel-blue-500: #0070F3;
+      --vercel-blue-700: #0761D1;
+      --vercel-green-300: #48BB78;
+      --vercel-yellow-300: #F6E05E;
+      --vercel-red-300: #FC8181;
+      --vercel-purple-300: #B794F4;
+    }
+    
+    body {
+      font-family: 'Yomogi', 'Zen Kurenaido', 'Kaisei Decol', sans-serif;
+      background-color: var(--vercel-gray-100);
+      color: var(--vercel-gray-500);
+      line-height: 1.4;
+      margin: 0;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      padding: 20px;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      position: relative;
+    }
+    
+    .header-title {
+      font-family: 'Kaisei Decol', serif;
+      font-size: 32px;
+      font-weight: bold;
+      margin: 0;
+      background: linear-gradient(90deg, var(--vercel-blue-500), var(--vercel-blue-700));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      position: relative;
+    }
+    
+    .header-title::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,1 Q25,0 50,2 T100,1' stroke='%230070F3' stroke-width='3' fill='none' stroke-linecap='round' stroke-dasharray='4 6'/%3E%3C/svg%3E");
+    }
+    
+    .header-date {
+      font-family: 'Zen Kurenaido', sans-serif;
+      font-size: 16px;
+      color: var(--vercel-gray-400);
+    }
+    
+    .content {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 0 10px;
+    }
+    
+    .column {
+      flex: 1;
+      min-width: 300px;
+    }
+    
+    .section {
+      background-color: var(--vercel-white);
+      border-radius: 12px;
+      margin-bottom: 20px;
+      padding: 15px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    
+    .section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 6px;
+      height: 100%;
+      background: linear-gradient(to bottom, var(--vercel-blue-500), var(--vercel-blue-300));
+      border-radius: 12px 0 0 12px;
+    }
+    
+    .section-title {
+      font-family: 'Kaisei Decol', serif;
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--vercel-blue-700);
+      margin-top: 0;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      padding-left: 6px;
+    }
+    
+    .section-title svg {
+      margin-right: 8px;
+    }
+    
+    .price-range {
+      font-family: 'Yomogi', sans-serif;
+      font-size: 24px;
+      color: var(--vercel-black);
+      background: linear-gradient(120deg, var(--vercel-blue-100) 0%, rgba(255,255,255,0) 70%);
+      padding: 5px 12px;
+      border-radius: 8px;
+      display: inline-block;
+      margin: 6px 0;
+    }
+    
+    .hand-drawn {
+      border: 2px solid var(--vercel-gray-400);
+      border-radius: 8px;
+      padding: 10px;
+      position: relative;
+      background-color: white;
+    }
+    
+    .hand-drawn::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      border: 2px solid var(--vercel-gray-400);
+      border-radius: 10px;
+      z-index: -1;
+      transform: rotate(-0.5deg);
+    }
+    
+    .role-card {
+      background-color: white;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      position: relative;
+      transition: transform 0.3s;
+    }
+    
+    .role-card:hover {
+      transform: translateY(-2px);
+    }
+    
+    .role-icon {
+      background-color: var(--vercel-blue-100);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+    
+    .role-info {
+      flex-grow: 1;
+    }
+    
+    .role-name {
+      font-family: 'Kaisei Decol', serif;
+      font-weight: bold;
+      font-size: 16px;
+      margin: 0 0 4px 0;
+      color: var(--vercel-black);
+    }
+    
+    .role-description {
+      font-size: 14px;
+      margin: 0;
+      color: var(--vercel-gray-400);
+    }
+    
+    .role-price {
+      font-family: 'Zen Kurenaido', sans-serif;
+      font-size: 14px;
+      font-weight: bold;
+      color: var(--vercel-gray-500);
+      background-color: var(--vercel-gray-200);
+      padding: 4px 8px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    
+    .role-price.free {
+      background-color: var(--vercel-green-300);
+      color: white;
+    }
+    
+    .arrow {
+      position: relative;
+      margin: 20px 0;
+      height: 1px;
+      background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,1 L100,1' stroke='%23999999' stroke-width='2' fill='none' stroke-dasharray='5 5'/%3E%3C/svg%3E");
+    }
+    
+    .arrow::after {
+      content: '';
+      position: absolute;
+      right: -3px;
+      top: -6px;
+      width: 12px;
+      height: 12px;
+      border-top: 2px solid var(--vercel-gray-300);
+      border-right: 2px solid var(--vercel-gray-300);
+      transform: rotate(45deg);
+    }
+    
+    .bubble {
+      position: relative;
+      background-color: white;
+      border: 2px solid var(--vercel-gray-300);
+      border-radius: 20px;
+      padding: 12px 16px;
+      margin: 20px 0;
+    }
+    
+    .bubble::after {
+      content: '';
+      position: absolute;
+      left: 20px;
+      bottom: -10px;
+      width: 20px;
+      height: 20px;
+      background-color: white;
+      border-right: 2px solid var(--vercel-gray-300);
+      border-bottom: 2px solid var(--vercel-gray-300);
+      transform: rotate(45deg);
+    }
+    
+    .highlight {
+      position: relative;
+      display: inline;
+    }
+    
+    .highlight::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background-color: var(--vercel-yellow-300);
+      z-index: -1;
+      opacity: 0.6;
+    }
+    
+    .highlight-red::after {
+      background-color: var(--vercel-red-300);
+    }
+    
+    .highlight-blue::after {
+      background-color: var(--vercel-blue-300);
+    }
+    
+    .highlight-green::after {
+      background-color: var(--vercel-green-300);
+    }
+    
+    .highlight-purple::after {
+      background-color: var(--vercel-purple-300);
+    }
+    
+    .comparison-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 15px 0;
+      font-size: 14px;
+    }
+    
+    .comparison-table th, .comparison-table td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--vercel-gray-200);
+    }
+    
+    .comparison-table th {
+      background-color: var(--vercel-gray-200);
+      font-weight: bold;
+      color: var(--vercel-gray-500);
+    }
+    
+    .comparison-table tr:nth-child(even) {
+      background-color: var(--vercel-gray-100);
+    }
+    
+    .tag {
+      display: inline-block;
+      font-size: 12px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      margin-right: 4px;
+      background-color: var(--vercel-blue-100);
+      color: var(--vercel-blue-700);
+    }
+    
+    .tag.red {
+      background-color: #FEE2E2;
+      color: #B91C1C;
+    }
+    
+    .tag.green {
+      background-color: #DCFCE7;
+      color: #166534;
+    }
+    
+    .note {
+      font-size: 12px;
+      color: var(--vercel-gray-400);
+      margin-top: 10px;
+      font-style: italic;
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px dashed var(--vercel-gray-300);
+      color: var(--vercel-gray-400);
+      font-size: 14px;
+    }
+
+    .price-card {
+      background-color: white;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 10px 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .price-card-title {
+      font-family: 'Kaisei Decol', serif;
+      font-weight: bold;
+      margin: 0 0 8px 0;
+      color: var(--vercel-black);
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+    }
+
+    .price-card-price {
+      font-family: 'Zen Kurenaido', sans-serif;
+      font-size: 20px;
+      color: var(--vercel-blue-700);
+      margin: 8px 0;
+    }
+
+    .price-card-description {
+      font-size: 14px;
+      color: var(--vercel-gray-400);
+      margin: 8px 0 0 0;
+    }
+
+    @media (max-width: 768px) {
+      .column {
+        flex: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 class="header-title">Vercel Enterpriseプラン<br>コスト構造と権限モデル分析</h1>
+      <div class="header-date">調査日: 2025年3月4日</div>
+    </div>
+    
+    <div class="content">
+      <!-- Column 1: Basic Pricing & Overview -->
+      <div class="column">
+        <div class="section">
+          <h2 class="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12m11.32 11.32l2.12 2.12M1 12h3m16 0h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 4"/>
+            </svg>
+            Enterpriseプラン概要
+          </h2>
+          <div class="bubble">
+            Vercelは<span class="highlight highlight-blue">カスタム見積もり制</span>を採用。
+            ユーザー数、機能要件、使用量に応じて料金が決定します。
+          </div>
+          
+          <div class="hand-drawn">
+            <div class="price-range">年間 $22,000 〜 $45,000</div>
+            <p>4名の開発者チームの場合（月額約$1,800〜$3,750）</p>
+            <div class="arrow"></div>
+            <p>通常Proプランに比べて<span class="highlight">高度なセキュリティ機能</span>や<span class="highlight">専用サポート</span>が含まれます</p>
+          </div>
+          
+          <div class="note">※交渉次第で初期提示価格から最大50%程度割引されるケースも</div>
+        </div>
+        
+        <div class="section">
+          <h2 class="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2" stroke-dasharray="2 2"/>
+              <path d="M9 10l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            料金構成の内訳
+          </h2>
+          
+          <div class="price-card">
+            <div class="price-card-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              基本契約額
+            </div>
+            <div class="price-card-price">年間 $22,000〜$45,000</div>
+            <div class="price-card-description">初期ユーザー（約4名分）を含む基本料金</div>
+          </div>
+          
+          <div class="price-card">
+            <div class="price-card-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              追加ユーザー料金
+            </div>
+            <div class="price-card-price">$20+/ユーザー/月</div>
+            <div class="price-card-description">Proプラン料金($20)を基準に上乗せ</div>
+          </div>
+          
+          <div class="price-card">
+            <div class="price-card-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              インフラ使用量
+            </div>
+            <div class="price-card-price">従量課金制</div>
+            <div class="price-card-description">トラフィック量とサーバーレス関数の実行時間に応じて変動</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Column 2: Secure Compute & User Roles -->
+      <div class="column">
+        <div class="section">
+          <h2 class="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 3a9 9 0 100 18 9 9 0 000-18z" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="2"/>
+              <path d="M17.1 6.9L15.2 8.8M8.8 15.2L6.9 17.1m0-10.2l1.9 1.9m8.3 8.3l1.9 1.9M12 7V3m-9 9H7m10 0h4m-9 10v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 3"/>
+            </svg>
+            Secure Compute (プレミアム機能)
+          </h2>
+          
+          <div class="bubble">
+            <span class="highlight highlight-red">Enterpriseプラン専用の有償アドオン</span>機能。
+            プライベートネットワーク接続と専用IPアドレスを提供します。
+          </div>
+          
+          <div class="price-card">
+            <div class="price-card-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m16 0h-4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              初期設定費
+            </div>
+            <div class="price-card-price">$5,000〜$15,000</div>
+            <div class="price-card-description">VPC構築とネットワーク設計の初期コスト</div>
+          </div>
+          
+          <div class="price-card">
+            <div class="price-card-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="6" width="18" height="15" rx="2" stroke="currentColor" stroke-width="2"/>
+                <path d="M3 10h18M8 14h8M8 18h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M8 3v3m8-3v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              月額固定費
+            </div>
+            <div class="price-card-price">$2,000〜$5,000/月</div>
+            <div class="price-card-description">専用リソース維持管理費用</div>
+          </div>
+          
+          <div class="price-card">
+            <div class="price-card-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 15v4h-4m-13-4v4h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M21 9H3m0 0l4-4M3 9l4 4M21 9l-4-4m4 4l-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              データ転送量
+            </div>
+            <div class="price-card-price">$0.05〜$0.12/GB</div>
+            <div class="price-card-description">アウトバウンドデータ転送に対する課金</div>
+          </div>
+          
+          <div class="price-card">
+            <div class="price-card-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 14l-6-6 6-6 6 6-6 6z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              </svg>
+              追加リージョン
+            </div>
+            <div class="price-card-price">$1,500/月/リージョン</div>
+            <div class="price-card-description">複数リージョンでの展開に追加費用</div>
+          </div>
+          
+          <div class="note">※月額コストが30〜50%増加するケースが一般的</div>
+        </div>
+      </div>
+      
+      <!-- Column 3: User Roles & Comparison -->
+      <div class="column">
+        <div class="section">
+          <h2 class="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+              <path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            ユーザーロールと料金
+          </h2>
+          
+          <div class="role-card">
+            <div class="role-icon">👑</div>
+            <div class="role-info">
+              <h3 class="role-name">Owner / Member</h3>
+              <p class="role-description">チーム全体の設定管理が可能な管理者権限</p>
+            </div>
+            <div class="role-price">有料シート</div>
+          </div>
+          
+          <div class="role-card">
+            <div class="role-icon">👨‍💻</div>
+            <div class="role-info">
+              <h3 class="role-name">Developer</h3>
+              <p class="role-description">デプロイや環境設定のみ可能</p>
+            </div>
+            <div class="role-price">有料シート</div>
+          </div>
+          
+          <div class="role-card">
+            <div class="role-icon">👀</div>
+            <div class="role-info">
+              <h3 class="role-name">Viewer</h3>
+              <p class="role-description">チーム内のプロジェクトを閲覧のみ可能</p>
+            </div>
+            <div class="role-price">有料シート</div>
+          </div>
+          
+          <div class="role-card">
+            <div class="role-icon">🤝</div>
+            <div class="role-info">
+              <h3 class="role-name">Contributor</h3>
+              <p class="role-description">プロジェクト単位で権限を付与可能</p>
+            </div>
+            <div class="role-price">有料シート</div>
+          </div>
+          
+          <div class="role-card">
+            <div class="role-icon">💰</div>
+            <div class="role-info">
+              <h3 class="role-name">Billing</h3>
+              <p class="role-description">請求情報の閲覧・管理のみ可能</p>
+            </div>
+            <div class="role-price free">無料</div>
+          </div>
+          
+          <div class="note">※有料シート = Proプランの$20/月をベースにカスタム料金。Billingロールのみ無料（Enterprise無制限）</div>
+        </div>
+        
+        <div class="section">
+          <h2 class="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 4h16v16H4V4z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M4 10h16M10 4v16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 3"/>
+            </svg>
+            競合サービス比較
+          </h2>
+          
+          <table class="comparison-table">
+            <tr>
+              <th>サービス</th>
+              <th>Enterprise料金帯</th>
+            </tr>
+            <tr>
+              <td><b>Vercel</b></td>
+              <td>〜$3,000/月<br><span class="tag red">要問合せ</span></td>
+            </tr>
+            <tr>
+              <td>Netlify</td>
+              <td>$2,000/月〜<br><span class="tag red">要問合せ</span></td>
+            </tr>
+            <tr>
+              <td>AWS Amplify</td>
+              <td>従量課金制<br><span class="tag green">低コスト可能</span></td>
+            </tr>
+            <tr>
+              <td>Cloudflare Pages</td>
+              <td>固定料金制<br><span class="tag green">無制限利用可</span></td>
+            </tr>
+          </table>
+          
+          <div class="bubble">
+            Vercelは<span class="highlight highlight-blue">管理工数の低さ</span>と<span class="highlight highlight-blue">監査対応の容易さ</span>が強み。ただしコスト面では競合より若干高めの傾向。
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+      出典: Vercel公式ドキュメント、Reddit、Hacker Newsほか • 調査日: 2025年3月4日
+    </div>
+  </div>
+</body>
+</html>
