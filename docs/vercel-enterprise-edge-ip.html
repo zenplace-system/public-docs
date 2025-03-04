@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vercel Enterprise PoC - IP アドレスの調査結果</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kaisei+Decol&family=Yomogi&family=Zen+Kurenaido&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --vercel-black: #000000;
+            --vercel-white: #ffffff;
+            --vercel-gray: #888888;
+            --vercel-light-gray: #fafafa;
+            --vercel-blue: #0070f3;
+            --vercel-cyan: #50e3c2;
+            --vercel-purple: #7928ca;
+            --vercel-violet: #8a63d2;
+            --vercel-pink: #ff0080;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Zen Kurenaido', sans-serif;
+            line-height: 1.4;
+            color: var(--vercel-black);
+            background-color: var(--vercel-light-gray);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--vercel-black) 0%, #333 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+        
+        .header::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--vercel-blue) 0%, var(--vercel-purple) 25%, var(--vercel-pink) 50%, var(--vercel-violet) 75%, var(--vercel-cyan) 100%);
+        }
+        
+        .title-container {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .title {
+            font-family: 'Kaisei Decol', serif;
+            font-size: 32px;
+            font-weight: bold;
+            background: linear-gradient(to right, var(--vercel-blue), var(--vercel-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            color: #ccc;
+            font-family: 'Yomogi', cursive;
+        }
+        
+        .date {
+            font-size: 14px;
+            color: var(--vercel-gray);
+            text-align: right;
+        }
+        
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 30px;
+            gap: 25px;
+        }
+        
+        .column {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 25px;
+            position: relative;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--vercel-blue), var(--vercel-cyan));
+            border-radius: 14px;
+            z-index: -1;
+            opacity: 0.3;
+        }
+        
+        .code-card {
+            background-color: #f7f7f7;
+            border-left: 4px solid var(--vercel-blue);
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-x: auto;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .code-result {
+            background-color: #000;
+            color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+        
+        .ipv6 {
+            color: var(--vercel-blue);
+            font-weight: bold;
+        }
+        
+        .ipv4 {
+            color: var(--vercel-pink);
+            font-weight: bold;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            color: var(--vercel-blue);
+            font-family: 'Kaisei Decol', serif;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px dashed var(--vercel-gray);
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title::before {
+            content: "✏️";
+            margin-right: 8px;
+        }
+        
+        .explanation-title::before {
+            content: "🔍";
+        }
+        
+        .code-title::before {
+            content: "💻";
+        }
+        
+        .result-title::before {
+            content: "📊";
+        }
+        
+        .text {
+            font-size: 14px;
+            color: #334155;
+            margin-bottom: 15px;
+        }
+        
+        .highlight {
+            background: linear-gradient(transparent 60%, rgba(255, 0, 128, 0.2) 40%);
+            padding: 0 2px;
+        }
+        
+        .bubble {
+            position: relative;
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-left: 3px solid var(--vercel-blue);
+        }
+        
+        .bubble::before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            border-width: 0 10px 10px;
+            border-style: solid;
+            border-color: transparent transparent white;
+        }
+        
+        .reason {
+            margin-bottom: 15px;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .reason::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--vercel-purple);
+            font-weight: bold;
+        }
+        
+        .reason-title {
+            color: var(--vercel-blue);
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .diagram {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .arrow {
+            position: relative;
+            height: 2px;
+            background-color: var(--vercel-blue);
+            width: 50px;
+            margin: 0 10px;
+            align-self: center;
+        }
+        
+        .arrow::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid var(--vercel-blue);
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+        
+        .box {
+            padding: 10px 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            min-width: 100px;
+            border: 1px dashed var(--vercel-gray);
+        }
+        
+        .edgefunction {
+            background-color: black;
+            color: white;
+            border: none;
+        }
+        
+        .ipv6-box {
+            border-color: var(--vercel-blue);
+            color: var(--vercel-blue);
+        }
+        
+        .ipv4-box {
+            border-color: var(--vercel-pink);
+            color: var(--vercel-pink);
+        }
+        
+        .footer {
+            padding: 20px;
+            text-align: center;
+            color: var(--vercel-gray);
+            font-size: 12px;
+            border-top: 1px solid #eee;
+        }
+        
+        .handwritten-arrow {
+            position: absolute;
+            width: 50px;
+            height: 30px;
+            transform: rotate(30deg);
+        }
+        
+        .handwritten-arrow svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* レスポンシブデザイン */
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .column {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title-container">
+                <h1 class="title">Vercel Enterprise エッジ関数の IP アドレス調査</h1>
+                <div class="subtitle">VPC環境でのIPv4/IPv6混在の謎を解明する</div>
+            </div>
+            <div class="date">2025年3月4日</div>
+        </div>
+        
+        <div class="content">
+            <div class="column">
+                <div class="card">
+                    <h2 class="section-title">調査の背景</h2>
+                    <p class="text">
+                        Vercel Enterpriseプランの<span class="highlight">PoC（Proof of Concept）</span>として、
+                        Enterprise Secure Compute環境内でVercelプロジェクトのエッジ関数が
+                        どのようなIPアドレスを使用しているかを調査しました。
+                    </p>
+                    <p class="text">
+                        VPC内に配置されたVercelプロジェクトのエッジ関数が
+                        <span class="highlight">自身のIPアドレスを取得</span>した結果、
+                        <span class="highlight">IPv6形式とIPv4形式が混在</span>している状況が確認されました。
+                    </p>
+                </div>
+                
+                <div class="card">
+                    <h2 class="section-code code-title">テスト用エッジ関数</h2>
+                    <p class="text">
+                        複数のIP確認サービスを使用して、エッジ関数自身のIPアドレスを取得します。
+                    </p>
+                    <div class="code-card">
+const ipServices = [<br>
+&nbsp;&nbsp;{ name: 'ipify', url: 'https://api.ipify.org?format=json' },<br>
+&nbsp;&nbsp;{ name: 'ipify-v6', url: 'https://api64.ipify.org?format=json' },<br>
+&nbsp;&nbsp;{ name: 'ifconfig.me', url: 'https://ifconfig.me/ip' },<br>
+&nbsp;&nbsp;{ name: 'ipinfo.io', url: 'https://ipinfo.io/json' }<br>
+];
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2 class="section-title result-title">取得結果</h2>
+                    <div class="code-result">
+{<br>
+&nbsp;&nbsp;ip: <span class="ipv6">"2a06:98c0:3600:103"</span>,<br>
+&nbsp;&nbsp;details: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;successful: [<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ service: "ipify", ip: <span class="ipv6">"2a06:98c0:3600:103"</span> },<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ service: "ipify-v6", ip: <span class="ipv6">"2a06:98c0:3600:103"</span> },<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ service: "ifconfig.me", ip: <span class="ipv4">"172.71.100.196"</span> },<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ service: "ipinfo.io", ip: <span class="ipv4">"172.69.169.174"</span> }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;],<br>
+&nbsp;&nbsp;&nbsp;&nbsp;failed: []<br>
+&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;timestamp: "2025-03-04T02:32:33.879Z",<br>
+&nbsp;&nbsp;runtime: "edge"<br>
+}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="column">
+                <div class="card">
+                    <h2 class="section-title explanation-title">なぜIPv4とIPv6が混在するのか？</h2>
+                    <div class="bubble">
+                        <p class="text">
+                            同じエッジ関数からのリクエストなのに、サービスによって異なるIPアドレス形式が返されるのはなぜでしょうか？
+                        </p>
+                    </div>
+                    
+                    <div class="reason">
+                        <h3 class="reason-title">1. デュアルスタックネットワーキング</h3>
+                        <p class="text">
+                            Vercelのエッジサーバーは<span class="highlight">IPv4とIPv6の両方をサポート</span>するデュアルスタック構成になっています。
+                            同じエッジサーバーでも、外部サービスへの接続時に異なるIPプロトコルを使用することがあります。
+                        </p>
+                    </div>
+                    
+                    <div class="diagram">
+                        <div class="box edgefunction">Edge Function</div>
+                        <div class="arrow"></div>
+                        <div class="box ipv6-box">IPv6接続</div>
+                    </div>
+                    <div class="diagram">
+                        <div class="box edgefunction">Edge Function</div>
+                        <div class="arrow"></div>
+                        <div class="box ipv4-box">IPv4接続</div>
+                    </div>
+                    
+                    <div class="reason">
+                        <h3 class="reason-title">2. サービス特有のルーティング</h3>
+                        <p class="text">
+                            <span class="highlight">サービスごとに異なるネットワークパス</span>を通る可能性があります：
+                        </p>
+                        <ul style="list-style-type: none; padding-left: 15px;">
+                            <li>・ ipifyとipify-v6 → <span class="ipv6">IPv6アドレス</span>を返す</li>
+                            <li>・ ifconfig.meとipinfo.io → <span class="ipv4">IPv4アドレス</span>を返す</li>
+                        </ul>
+                        <p class="text">
+                            これは、Vercelの<span class="highlight">別のゲートウェイやNAT</span>を通じてルーティングされている可能性を示しています。
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="column">
+                <div class="card">
+                    <div class="reason">
+                        <h3 class="reason-title">3. プロキシレイヤー</h3>
+                        <p class="text">
+                            Vercelのエンタープライズネットワークアーキテクチャでは、<span class="highlight">複数のプロキシレイヤー</span>が存在します。
+                            宛先に応じて<span class="highlight">異なるアウトバウンドIPアドレス</span>を使用することがあります。
+                        </p>
+                    </div>
+                    
+                    <div class="diagram">
+                        <div class="box edgefunction">Edge Function</div>
+                        <div class="arrow"></div>
+                        <div class="box">プロキシA</div>
+                        <div class="arrow"></div>
+                        <div class="box ipv6-box">IPv6サービス</div>
+                    </div>
+                    <div class="diagram">
+                        <div class="box edgefunction">Edge Function</div>
+                        <div class="arrow"></div>
+                        <div class="box">プロキシB</div>
+                        <div class="arrow"></div>
+                        <div class="box ipv4-box">IPv4サービス</div>
+                    </div>
+                    
+                    <div class="reason">
+                        <h3 class="reason-title">4. サービスの設計</h3>
+                        <p class="text">
+                            それぞれのIPチェックサービスは<span class="highlight">プロトコルの選択方法が異なります</span>：
+                        </p>
+                        <ul style="list-style-type: none; padding-left: 15px;">
+                            <li>・ api64.ipify.org → <span class="highlight">IPv6を優先</span>するよう設計</li>
+                            <li>・ 他のサービス → デフォルトでIPv4を返す、または<span class="highlight">クライアントの接続プロトコル</span>に基づいて応答</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2 class="section-title">考察</h2>
+                    <p class="text">
+                        Vercelのエンタープライズセキュアコンピュートモデルでは、VPC内でのネットワークトラフィックが複雑になるため、このような混在した結果が生じると考えられます。
+                    </p>
+                    <p class="text">
+                        これは<span class="highlight">エッジコンピューティングの特性</span>であり、特にVercelのような分散ネットワークでは正常な動作です。
+                    </p>
+                    <p class="text">
+                        単一のエッジファンクションでも、<span class="highlight">アウトバウンド接続の宛先や時間</span>によって、使用されるIPアドレスが変わることがあります。
+                    </p>
+                    <div class="bubble">
+                        <p class="text">
+                            これはトラフィック最適化やフェイルオーバー機能の一部と考えられます。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            © 2025 Vercel Enterprise PoC 調査レポート | 作成: Claude Assistant
+        </div>
+    </div>
+</body>
+</html>
