@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>東十条の多様な食文化</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaisei+Decol&family=Yomogi&family=Zen+Kurenaido&display=swap">
+    <style>
+        :root {
+            --color-1: #034159;
+            --color-2: #025951;
+            --color-3: #02735E;
+            --color-4: #038C3E;
+            --color-5: #0CF25D;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Zen Kurenaido', sans-serif;
+            background-color: #f8f9fa;
+            color: #334155;
+            line-height: 1.4;
+            padding: 20px;
+            background-image: 
+                linear-gradient(45deg, rgba(2, 89, 81, 0.03) 25%, transparent 25%), 
+                linear-gradient(-45deg, rgba(2, 114, 94, 0.03) 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, rgba(2, 89, 81, 0.03) 75%), 
+                linear-gradient(-45deg, transparent 75%, rgba(2, 114, 94, 0.03) 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            animation: backgroundShift 30s infinite linear;
+        }
+        
+        @keyframes backgroundShift {
+            0% { background-position: 0 0, 0 10px, 10px -10px, -10px 0px; }
+            100% { background-position: 50px 50px, 50px 60px, 60px 40px, 40px 50px; }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--color-3);
+            position: relative;
+        }
+        
+        header::after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--color-4);
+            border-radius: 3px;
+        }
+        
+        .title-area {
+            flex: 1;
+        }
+        
+        h1 {
+            font-family: 'Kaisei Decol', serif;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, var(--color-1), var(--color-3));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--color-2), var(--color-5));
+            border-radius: 3px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            color: #475569;
+            font-weight: normal;
+            font-family: 'Yomogi', cursive;
+        }
+        
+        .meta-info {
+            text-align: right;
+            font-size: 14px;
+            color: #64748b;
+        }
+        
+        .date {
+            display: inline-block;
+            padding: 5px 10px;
+            background: var(--color-3);
+            color: white;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            font-family: 'Zen Kurenaido', sans-serif;
+            transform: rotate(2deg);
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .source {
+            font-size: 12px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--color-2), var(--color-4));
+        }
+        
+        h2 {
+            font-size: 18px;
+            color: #1e40af;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px dashed var(--color-3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Kaisei Decol', serif;
+        }
+        
+        h2 i {
+            color: var(--color-3);
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        h3 {
+            font-size: 16px;
+            color: var(--color-2);
+            margin: 15px 0 10px;
+            font-family: 'Yomogi', cursive;
+            position: relative;
+            padding-left: 18px;
+        }
+        
+        h3::before {
+            content: "✦";
+            position: absolute;
+            left: 0;
+            color: var(--color-4);
+        }
+        
+        p {
+            font-size: 14px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .highlight {
+            font-weight: bold;
+            color: var(--color-1);
+            background: linear-gradient(transparent 60%, rgba(12, 242, 92, 0.3) 40%);
+            padding: 0 2px;
+        }
+        
+        .tag {
+            display: inline-block;
+            background: var(--color-3);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            transform: rotate(-1deg);
+        }
+        
+        .info-block {
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(2, 114, 94, 0.1);
+            border-left: 3px solid var(--color-3);
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .icon-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .icon-list li {
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .icon-list li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--color-4);
+            font-weight: bold;
+        }
+        
+        .food-icon {
+            font-size: 24px;
+            color: var(--color-3);
+            margin-right: 10px;
+            animation: spin 7s infinite linear;
+            display: inline-block;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+        
+        .stat {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            gap: 10px;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--color-1);
+            font-family: 'Kaisei Decol', serif;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #475569;
+        }
+        
+        .arrow-connector {
+            position: relative;
+            padding-bottom: 30px;
+            margin-bottom: 10px;
+        }
+        
+        .arrow-connector::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 20px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 20'%3E%3Cpath d='M15 20 L30 0 L0 0 Z' fill='%23038C3E'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        
+        .speech-bubble {
+            position: relative;
+            background: white;
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin: 15px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--color-3);
+        }
+        
+        .speech-bubble::before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            border-width: 0 10px 10px;
+            border-style: solid;
+            border-color: var(--color-3) transparent;
+        }
+        
+        .speech-bubble::after {
+            content: "";
+            position: absolute;
+            top: -7px;
+            left: 22px;
+            border-width: 0 8px 8px;
+            border-style: solid;
+            border-color: white transparent;
+        }
+        
+        .banner {
+            background: linear-gradient(135deg, var(--color-2), var(--color-3));
+            color: white;
+            padding: 8px 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            text-align: center;
+            position: relative;
+            transform: rotate(-1deg);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .banner::before, .banner::after {
+            content: "✦";
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+        }
+        
+        .banner::before {
+            left: 10px;
+        }
+        
+        .banner::after {
+            right: 10px;
+        }
+        
+        .rating {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        
+        .rating i {
+            color: gold;
+            margin-right: 2px;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+        }
+        
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--color-3);
+            font-size: 12px;
+            color: #64748b;
+            text-align: center;
+        }
+        
+        .hand-drawn-border {
+            position: relative;
+            margin: 20px 0;
+            padding: 15px;
+        }
+        
+        .hand-drawn-border::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid var(--color-3);
+            border-radius: 10px;
+            transform: rotate(-0.5deg);
+            z-index: -1;
+        }
+        
+        .hand-drawn-border::after {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            right: 3px;
+            bottom: 3px;
+            border: 1px dashed var(--color-4);
+            border-radius: 8px;
+            transform: rotate(0.7deg);
+            z-index: -1;
+        }
+        
+        .grid-full {
+            grid-column: 1 / -1;
+        }
+        
+        .grid-span-2 {
+            grid-column: span 2;
+        }
+        
+        .note {
+            background: #fff9c4;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-family: 'Yomogi', cursive;
+            font-size: 13px;
+            transform: rotate(1deg);
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
+            position: relative;
+            margin: 15px 0;
+        }
+        
+        .note::before {
+            content: "";
+            position: absolute;
+            top: -5px;
+            left: 10px;
+            width: 20px;
+            height: 10px;
+            background: rgba(2, 89, 81, 0.2);
+            border-radius: 2px;
+            transform: rotate(-10deg);
+        }
+        
+        .note-pin {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            width: 8px;
+            height: 8px;
+            background: var(--color-1);
+            border-radius: 50%;
+            box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            header {
+                flex-direction: column;
+            }
+            
+            .meta-info {
+                text-align: left;
+                margin-top: 15px;
+            }
+            
+            .grid-span-2 {
+                grid-column: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="title-area">
+                <h1>東十条の多様な食文化</h1>
+                <div class="subtitle">下町情緒とモダンな味覚の交差点</div>
+            </div>
+            <div class="meta-info">
+                <div class="date">2025年3月5日</div>
+                <div class="source">情報源: 東十条地域飲食店調査レポート</div>
+            </div>
+        </header>
+        
+        <div class="grid">
+            <div class="card grid-full">
+                <h2><i class="fas fa-utensils food-icon"></i> 東十条の食文化概要</h2>
+                <p>東京都北区に位置する東十条は、<span class="highlight">下町の風情を残しながら</span>も新たな飲食店が次々と登場する食の激戦区です。駅周辺には商店街が広がり、地元住民に愛される老舗から若手シェフによる斬新なコンセプト店まで、多層的な食文化が形成されています。</p>
+                
+                <div class="speech-bubble">
+                    2025年3月時点での最新動向として、<span class="highlight">野菜料理に特化した店舗の台頭</span>が目立ち、健康志向の高まりを反映したメニュー開発が進んでいます。
+                </div>
+                
+                <div class="info-block">
+                    <div class="food-icon"><i class="fas fa-store"></i></div>
+                    <strong>店舗の特徴:</strong> 伝統的な和食店では、創業70年を超えるそば処「㐂久家」がエビかき揚げで地元の支持を集め、イタリアンレストラン「Griken」では北区産野菜を活用した現代的な料理が提供されるなど、<span class="highlight">新旧の融合</span>が特徴的です。
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2><i class="fas fa-bowl-food food-icon"></i> ラーメン文化</h2>
+                <h3>豚骨ラーメンの革新と伝統</h3>
+                <p>東十条のラーメン戦国時代を象徴する「ラーメン本田」では、豚背脂をふんだんに使用した濃厚スープが特徴で、特に<span class="highlight">ニンニクを効かせた「醤油ラーメン」</span>が人気を博しています。</p>
+                
+                <div class="note">
+                    <div class="note-pin"></div>
+                    店主が開発した独自の麺打ち技術により、スープとの絡みを追求した中太麺が使用され、食感にこだわりを見せる
+                </div>
+                
+                <h3>新進気鋭の創作ラーメン店</h3>
+                <p>2024年にオープンした「麺処 ほん田」では、煮干しダシと鶏ガラスープを黄金比でブレンドした「Wスープ醤油」が話題を呼んでいます。</p>
+                
+                <div class="stat">
+                    <div class="stat-number">11:00</div>
+                    <div class="stat-label">から行列ができる人気店</div>
+                </div>
+                
+                <ul class="icon-list">
+                    <li>トッピングの自家製味玉が絶妙な塩加減</li>
+                    <li>季節限定「桜エビ香る春限定ラーメン」が話題</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h2><i class="fas fa-bacon food-icon"></i> とんかつの新潮流</h2>
+                <h3>伝統技法の継承と進化</h3>
+                <p>「とんかつ 順」では鹿児島産黒豚を使用したロースカツが看板メニューで、衣のサクサク感を保つため、<span class="highlight">揚げ油の温度管理を0.5℃単位で制御</span>する徹底ぶりが見られます。</p>
+                
+                <div class="banner">
+                    北区契約農家から直送される新鮮キャベツ
+                </div>
+                
+                <h3>現代的なアレンジの登場</h3>
+                <p>2025年2月にリニューアルオープンした「Griken」の「和牛ヒレカツ トリュフソースがけ」は、イタリアンと和食の融合を図った意欲作として注目を集めています。</p>
+                
+                <div class="rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                </div>
+                <p>地元の食通からは「<span class="highlight">従来のとんかつ概念を覆す革新性</span>」と評されるなど、新たな市場形成に成功しています。</p>
+            </div>
+            
+            <div class="card">
+                <h2><i class="fas fa-beer food-icon"></i> 居酒屋文化の多様性</h2>
+                <h3>地酒と郷土料理の専門店</h3>
+                <p>「J.J.ぽっち十条店」では日本全国の地酒を常時50種類以上取り揃え、季節ごとのテーマ企画を実施しています。2025年春には「<span class="highlight">東北六県地酒飲み比べフェア</span>」を開催。</p>
+                
+                <div class="tag">宮城県の浦霞</div>
+                <div class="tag">山形県の十四代</div>
+                <div class="tag">希少銘柄</div>
+                
+                <h3>モダン居酒屋の台頭</h3>
+                <p>「COBACO」ではカクテル創作に重点を置き、日本の四季を表現したオリジナルドリンクが評判を呼んでいます。</p>
+                
+                <div class="info-block">
+                    <div class="food-icon"><i class="fas fa-cocktail"></i></div>
+                    <p><strong>人気メニュー:</strong><br>桜の葉を燻製にしたスモーキーなマティーニや、抹茶リキュールをベースにした和風カクテル</p>
+                </div>
+                
+                <p>店内デザインは廃校を再利用したノスタルジックな空間で、20代〜30代の女性客を中心に人気を集めています。</p>
+            </div>
+            
+            <div class="card">
+                <h2><i class="fas fa-pizza-slice food-icon"></i> イタリア料理の革新</h2>
+                <h3>北区産食材を活かした料理開発</h3>
+                <p>「Griken」のシェフは北区の農家と直接契約を結び、<span class="highlight">旬の野菜をふんだんに使用</span>したメニューを展開しています。</p>
+                
+                <ul class="icon-list">
+                    <li>春先には地元で収穫された菜の花のペスト</li>
+                    <li>三芳町産小麦を使用した手打ちパスタ</li>
+                    <li>イタリアの小型ワイナリーに特化したワインリスト</li>
+                </ul>
+                
+                <div class="stat">
+                    <div class="stat-number">80+</div>
+                    <div class="stat-label">種類の自然派ワインを常備</div>
+                </div>
+                
+                <h3>伝統技法と現代的な解釈の融合</h3>
+                <p>「Osteria Ta~mia」ではヴェネト州で学んだ技術を基盤にしながら、日本の食材を大胆に取り入れた創作料理を提供します。</p>
+                
+                <div class="note">
+                    <div class="note-pin"></div>
+                    短角牛のカルパッチョにわさび醤油ソースを組み合わせるなど、東西の味覚を架橋する試み
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2><i class="fas fa-seedling food-icon"></i> そば文化と野菜料理</h2>
+                <h3>老舗そば店の挑戦</h3>
+                <p>「一東菴」では茨城県の自家農園で栽培したソバを石臼で挽き、<span class="highlight">毎朝店内で製麺</span>を行います。特に十割そばの風味を活かすため、挽き立て粉を使用した「生粉打ち」技法を採用。</p>
+                
+                <div class="banner">
+                    ミシュランガイドのビブグルマンに9年連続で選出
+                </div>
+                
+                <h3>野菜専門店の台頭</h3>
+                <p>「温野菜東十条店」では90品以上の野菜料理を食べ放題形式で提供し、91%の顧客が味に満足している調査結果が出ています。</p>
+                
+                <div class="info-block">
+                    <div class="food-icon"><i class="fas fa-carrot"></i></div>
+                    <p><strong>特徴:</strong> 北区産有機野菜を使用した「季節限定サラダバー」が人気で、10種類以上のドレッシングから好みの組み合わせが選べるシステム</p>
+                </div>
+                
+                <p>「お惣菜とお弁当ぐぅぐぅ」では、祖母の味を現代風にアレンジした野菜中心の惣菜を提供。かぼちゃの煮物にココナッツオイルを加えるなど、<span class="highlight">健康意識の高い層に向けたイノベーション</span>が特徴的です。</p>
+            </div>
+            
+            <div class="card grid-full">
+                <h2><i class="fas fa-chart-pie food-icon"></i> 結論：多様性が生む食のエコシステム</h2>
+                <p>東十条の食文化は<span class="highlight">伝統と革新が絶妙に融合</span>した生態系を形成しています。ラーメン店の密集するエリアでは熾烈な品質競争が行われ、一方でイタリアンレストランや野菜専門店など新ジャンルの店舗が次々と台頭する多極化現象が観察されます。</p>
+                
+                <div class="hand-drawn-border">
+                    <h3>今後の発展方向</h3>
+                    <ul class="icon-list">
+                        <li>デジタル技術を活用した予約システムの導入</li>
+                        <li>サステナブル食材の使用拡大</li>
+                        <li>飲食店の集積効果を活かした「食のテーマパーク」化の可能性</li>
+                        <li>観光資源としての更なる進化</li>
+                    </ul>
+                </div>
+                
+                <div class="speech-bubble">
+                    <p>地産地消の動きが加速する中、<span class="highlight">北区産食材を活用したメニュー開発</span>が各店舗で進められ、地域経済の活性化にも寄与しています。</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>出典: 東十条飲食店情報 2025年3月調査 | 情報参照元: 各店舗公式サイト、SNS、グルメレビューサイト</p>
+            <p>引用元: www.jjpotchi.com, www.instagram.com/gkyamyam, twitter.com/hjj_ninnikuabur, osha-kimi.com/food/jujo-jun/, twitter.com/yuji04232321, griken.com, www.instagram.com/COBACO_stand, san-tatsu.jp/collects/144344/, www.hotpepper.jp/strJ000031819/report/, www.jalan.net/gourmet/tow_131170028/, retty.me/area/PRE13/ARE24/SUB2403/STAN2018/</p>
+        </footer>
+    </div>
+</body>
+</html>
