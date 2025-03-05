@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Next.jsでよくあるミス29選 - 黒板アート</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&family=Yomogi&family=Kaisei+Decol&display=swap');
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Zen Maru Gothic', sans-serif;
+      background-color: #253C30;
+      color: #F5F5F5;
+      padding: 20px;
+      line-height: 1.6;
+      background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%231a2e22' fill-opacity='0.2' fill-rule='evenodd'/%3E%3C/svg%3E");
+      position: relative;
+    }
+    
+    .blackboard {
+      background-color: #253C30;
+      border: 15px solid #5A3D2B;
+      border-radius: 5px;
+      padding: 30px;
+      position: relative;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      min-height: 100vh;
+    }
+    
+    .blackboard::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 50px 50px, rgba(255, 255, 255, 0.03) 0, rgba(255, 255, 255, 0) 60px),
+        radial-gradient(circle at 150px 150px, rgba(255, 255, 255, 0.03) 0, rgba(255, 255, 255, 0) 80px),
+        radial-gradient(circle at 300px 200px, rgba(255, 255, 255, 0.03) 0, rgba(255, 255, 255, 0) 100px);
+      z-index: 0;
+      pointer-events: none;
+    }
+    
+    .chalk-text {
+      font-family: 'Kaisei Decol', serif;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+      position: relative;
+      z-index: 1;
+    }
+    
+    .title {
+      font-family: 'Yomogi', cursive;
+      font-size: 36px;
+      color: #F5F5F5;
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #F5F5F5;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      letter-spacing: 2px;
+    }
+    
+    .subtitle {
+      font-size: 22px;
+      color: #FFEAA0;
+      margin-bottom: 20px;
+      font-family: 'Kaisei Decol', serif;
+    }
+    
+    .section-title {
+      font-size: 24px;
+      color: #A0D1FF;
+      margin: 30px 0 15px;
+      border-bottom: 1px dashed #A0D1FF;
+      padding-bottom: 5px;
+      font-family: 'Yomogi', cursive;
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 20px;
+    }
+    
+    .mistake-card {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 5px;
+      padding: 15px;
+      position: relative;
+      margin-bottom: 20px;
+      transition: transform 0.3s;
+    }
+    
+    .mistake-card:hover {
+      transform: scale(1.02);
+    }
+    
+    .mistake-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        linear-gradient(45deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(255, 255, 255, 0.05) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(255, 255, 255, 0.05) 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+      border-radius: 5px;
+      z-index: -1;
+    }
+    
+    .mistake-title {
+      font-size: 20px;
+      color: #FF9E9E;
+      margin-bottom: 10px;
+      border-left: 3px solid #FF9E9E;
+      padding-left: 10px;
+      font-family: 'Yomogi', cursive;
+    }
+    
+    .mistake-number {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      background: #FFEAA0;
+      color: #253C30;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 30px;
+      margin-right: 10px;
+      font-weight: bold;
+    }
+    
+    .problem {
+      color: #FF9E9E;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+    
+    .solution {
+      color: #A0FFCF;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+    
+    .solution::before {
+      content: "✓ ";
+    }
+    
+    .chalk-underline {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .chalk-underline::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -2px;
+      width: 100%;
+      height: 2px;
+      background: #A0D1FF;
+      border-radius: 2px;
+    }
+    
+    .emphasis {
+      color: #FF9E9E;
+      font-weight: bold;
+    }
+    
+    .chalk-box {
+      border: 2px dashed #F5F5F5;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 5px;
+    }
+    
+    .erased {
+      opacity: 0.6;
+      text-decoration: line-through;
+    }
+    
+    .chalk-arrow {
+      display: inline-block;
+      margin: 0 10px;
+      color: #FFEAA0;
+      font-weight: bold;
+    }
+    
+    .chalk-divider {
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #F5F5F5, transparent);
+      margin: 30px 0;
+      opacity: 0.5;
+    }
+    
+    .chalk-icon {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+    
+    .chalk-fingerprint {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 50%;
+    }
+    
+    .fingerprint1 {
+      top: 20px;
+      right: 50px;
+      transform: rotate(15deg);
+    }
+    
+    .fingerprint2 {
+      bottom: 30px;
+      left: 40px;
+      transform: rotate(-20deg);
+    }
+    
+    .corner-text {
+      position: absolute;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.4);
+      font-family: 'Kaisei Decol', serif;
+    }
+    
+    .top-right {
+      top: 20px;
+      right: 20px;
+    }
+    
+    .bottom-left {
+      bottom: 20px;
+      left: 20px;
+    }
+    
+    .code-example {
+      font-family: monospace;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 10px;
+      border-radius: 5px;
+      margin: 10px 0;
+      position: relative;
+      white-space: pre-wrap;
+    }
+    
+    .bad-code {
+      color: #FF9E9E;
+    }
+    
+    .good-code {
+      color: #A0FFCF;
+    }
+    
+    .code-label {
+      position: absolute;
+      top: -10px;
+      right: 10px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+    }
+    
+    .bad-label {
+      background: #FF9E9E;
+      color: #253C30;
+    }
+    
+    .good-label {
+      background: #A0FFCF;
+      color: #253C30;
+    }
+    
+    .chalk-note {
+      background: rgba(255, 234, 160, 0.1);
+      border-left: 3px solid #FFEAA0;
+      padding: 10px;
+      margin: 15px 0;
+      font-size: 14px;
+      color: #FFEAA0;
+    }
+
+    .category-icon {
+      font-size: 24px;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .title {
+        font-size: 28px;
+      }
+      
+      .section-title {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="blackboard">
+    <div class="chalk-fingerprint fingerprint1"></div>
+    <div class="chalk-fingerprint fingerprint2"></div>
+    
+    <div class="corner-text top-right">2025年3月5日（水）</div>
+    <div class="corner-text bottom-left">Next.js 14 クラス</div>
+    
+    <h1 class="title chalk-text">Next.js でよくあるミス29選</h1>
+    <p class="subtitle chalk-text">〜初心者からシニアまで知っておくべきアンチパターンとその対策〜</p>
+    
+    <section>
+      <h2 class="section-title chalk-text">📌 サーバー/クライアントコンポーネントの基本</h2>
+      <div class="chalk-note">
+        Next.jsのApp Routerでは、<span class="emphasis">デフォルトですべてのコンポーネントがサーバーコンポーネント</span>です。クライアントコンポーネントにするには、ファイルの先頭に<span class="emphasis">'use client'</span>ディレクティブを追加します。
+      </div>
+      
+      <div class="grid">
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">1</span> use clientを高すぎる位置に配置</h3>
+          <p class="problem">親コンポーネントに安易にuse clientを追加すると、インポートするすべての子コンポーネントもクライアントコンポーネントになり、バンドルサイズが増大！</p>
+          <p class="solution">インタラクティブな要素（ボタン、フォームなど）を持つコンポーネントのみにuse clientを追加し、コンポーネントツリーの末端に近い部分で使用しましょう。</p>
+        </div>
+        
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">2</span> クライアントコンポーネントへのリファクタリング不足</h3>
+          <p class="problem">ページ内の小さな要素だけにインタラクティビティが必要なのに、ページ全体をクライアントコンポーネントにしてしまう。</p>
+          <p class="solution">インタラクティブな部分だけを別のコンポーネントに分離し、そのコンポーネントだけをクライアントコンポーネントにしましょう。</p>
+        </div>
+      </div>
+      
+      <div class="grid">
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">3</span> use clientがないからサーバーコンポーネントと思い込む</h3>
+          <p class="problem">ファイルにuse clientがなくても、クライアントコンポーネントからインポートされると自動的にクライアントコンポーネントになります。</p>
+          <p class="solution">常にクライアントコンポーネントであることを意図する場合は、明示的にファイルの先頭にuse clientを追加しましょう。</p>
+        </div>
+        
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">4</span> クライアントコンポーネント内でのラッピングの誤解</h3>
+          <p class="problem">クライアントコンポーネントがサーバーコンポーネントをラップすると、そのサーバーコンポーネントもクライアントになると思い込む。</p>
+          <p class="solution">childrenパターンでラップされたサーバーコンポーネントはサーバーコンポーネントのままです。コンパイラはインポート文に基づいて判断します。</p>
+        </div>
+      </div>
+    </section>
+    
+    <div class="chalk-divider"></div>
+    
+    <section>
+      <h2 class="section-title chalk-text">⚠️ よくある誤解とアンチパターン</h2>
+      
+      <div class="grid">
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">5</span> サーバーサイドでステート管理を使おうとする</h3>
+          <p class="problem">useStateやuseContextなどのReactフックをサーバーコンポーネントで使おうとするとエラーになります。</p>
+          <p class="solution">ステート管理はクライアントコンポーネントでのみ使用しましょう。サーバーではリクエスト間で状態を保持できません。</p>
+        </div>
+        
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">6</span> use serverをサーバーコンポーネント化に使う</h3>
+          <p class="problem">use serverディレクティブはサーバーコンポーネントを作るためのものではなく、誤って使うとサーバーアクション（APIエンドポイント）が作成され、セキュリティリスクに。</p>
+          <p class="solution">サーバーコンポーネントはデフォルトなので何もしなくてOK。コンポーネントをサーバー専用にしたい場合はserver-onlyパッケージを使いましょう。</p>
+        </div>
+      </div>
+      
+      <div class="grid">
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">8</span> クライアントコンポーネントはクライアントだけで実行されると思い込む</h3>
+          <p class="problem">クライアントコンポーネントは初期レンダリング時にサーバーサイドでも実行されます（プリレンダリング）。</p>
+          <p class="solution">window/localStorageなどのブラウザAPIを使う場合は、typeof window !== 'undefined'チェックを行うか、useEffect内で使いましょう。</p>
+          <div class="code-example">
+<span class="bad-code">// ❌ 問題あり
+function Component() {
+  // サーバーサイドでもクライアントサイドでも実行される
+  const data = localStorage.getItem('key');
+  return <div>{data}</div>;
+}</span>
+          </div>
+          <div class="code-example">
+<span class="good-code">// ✅ 正しい方法
+function Component() {
+  const [data, setData] = useState(null);
+  
+  useEffect(() => {
+    // クライアントサイドでのみ実行される
+    setData(localStorage.getItem('key'));
+  }, []);
+  
+  return <div>{data}</div>;
+}</span>
+          </div>
+        </div>
+        
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">10</span> ハイドレーションエラーを起こす</h3>
+          <p class="problem">サーバーでプリレンダリングしたHTMLとクライアントサイドでのレンダリング結果が一致しない場合にエラーが発生します。</p>
+          <p class="solution">ブラウザ環境のチェックとクライアント側のみの処理を適切に分離しましょう。suppressHydrationWarningは最終手段として。</p>
+        </div>
+      </div>
+    </section>
+    
+    <div class="chalk-divider"></div>
+    
+    <section>
+      <h2 class="section-title chalk-text">🔄 データフェッチと更新</h2>
+      
+      <div class="grid">
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">12</span> ルートハンドラーでデータを取得する</h3>
+          <p class="problem">API Routesを作成してそこからデータを取得するのは、不要なネットワークリクエストが発生して非効率です。</p>
+          <p class="solution">サーバーコンポーネント内で直接データフェッチを行いましょう。API Routesはウェブフックなどの外部からのリクエスト用です。</p>
+        </div>
+        
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">13</span> 複数の場所で同じデータを取得することを問題視する</h3>
+          <p class="problem">複数のコンポーネントで同じデータフェッチを記述すると、重複していると心配する。</p>
+          <p class="solution">Next.jsとReactには強力なキャッシュ機能があり、同じリクエストは最初の1回だけ実行されます。データを必要な場所で直接フェッチしても問題ありません。</p>
+        </div>
+      </div>
+      
+      <div class="grid">
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">14</span> データフェッチのウォーターフォール</h3>
+          <p class="problem">複数のデータを順次フェッチするコードを書くと、前のフェッチが完了するまで次が始まらず、ロード時間が長くなります。</p>
+          <p class="solution">Promise.all()やPromise.allSettled()を使って並行フェッチを実装しましょう。データフェッチは可能な限り高い位置で行うことも検討してください。</p>
+          <div class="code-example">
+<span class="bad-code">// ❌ ウォーターフォール（順次実行）
+async function Page() {
+  const products = await getProducts();
+  const ratings = await getRatings();
+  // products完了後にratingsが開始
+}</span>
+          </div>
+          <div class="code-example">
+<span class="good-code">// ✅ 並行フェッチ
+async function Page() {
+  const [products, ratings] = await Promise.all([
+    getProducts(),
+    getRatings()
+  ]);
+  // 両方同時に開始、両方完了後に続行
+}</span>
+          </div>
+        </div>
+        
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">16</span> ミューテーション後にビューが更新されない</h3>
+          <p class="problem">サーバーアクションでデータを更新しても、キャッシュされた古いレンダリング結果が表示され続けることがあります。</p>
+          <p class="solution">revalidatePathまたはrevalidateTag関数を使って、更新後にキャッシュを無効化しましょう。</p>
+          <div class="code-example">
+<span class="good-code">// ✅ サーバーアクション内でキャッシュ再検証
+export async function addProduct(data) {
+  await db.products.create(data);
+  // 特定のパスのキャッシュを無効化
+  revalidatePath('/products');
+}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <div class="chalk-divider"></div>
+    
+    <section>
+      <h2 class="section-title chalk-text">🛠️ サーバーアクション</h2>
+      
+      <div class="grid">
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">15</span> サーバーコンポーネントにデータを送信しようとする</h3>
+          <p class="problem">フォームのaction属性にサーバーコンポーネントを直接指定してデータを送信できません。</p>
+          <p class="solution">データの送信にはサーバーアクション（use serverディレクティブ付きの関数）を使いましょう。</p>
+        </div>
+        
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">17</span> サーバーアクションはサーバーコンポーネントでしか使えないと思い込む</h3>
+          <p class="problem">サーバーアクションはフォームでよく使われるため、サーバーコンポーネント専用と誤解されがちです。</p>
+          <p class="solution">サーバーアクションはクライアントコンポーネントからも直接インポートして呼び出せます。useTransitionと組み合わせるとローディング状態も管理できます。</p>
+        </div>
+      </div>
+      
+      <div class="grid">
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">18</span> サーバーアクションのバリデーションと保護不足</h3>
+          <p class="problem">サーバーアクションは本質的にはサーバー上のAPIエンドポイントなので、適切な保護が必要です。</p>
+          <p class="solution">Zodなどでデータをバリデーションし、認証・認可のチェックもしっかり行いましょう。</p>
+        </div>
+        
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">19</span> use serverをサーバー専用の保証に使う</h3>
+          <p class="problem">use serverディレクティブは関数をサーバーでのみ実行される保証ではなく、サーバーアクション化するためのものです。</p>
+          <p class="solution">コードをサーバー専用にするにはserver-onlyパッケージを使用し、ファイル名も明確にしましょう（例：serverUtils.ts）。</p>
+        </div>
+      </div>
+    </section>
+    
+    <div class="chalk-divider"></div>
+    
+    <section>
+      <h2 class="section-title chalk-text">🧩 ルーティングとパラメータ</h2>
+      
+      <div class="grid">
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">20</span> ダイナミックルートとサーチパラメータの誤解</h3>
+          <p class="problem">URLのパスパラメータ（[id]）とクエリパラメータ（?color=blue）の違いと使い方を混同します。</p>
+          <p class="solution">パスパラメータはparamsで、クエリパラメータはsearchParamsで受け取ります。両方ともページコンポーネントでのみ直接利用可能です。</p>
+        </div>
+        
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">21</span> サーチパラメータの扱いを誤る</h3>
+          <p class="problem">ページコンポーネントでsearchParamsを使うとサーバーサイドレンダリングされ、URLの変更時にネットワークリクエストが発生します。</p>
+          <p class="solution">サーバーサイドの処理が必要ならsearchParams propを、クライアントサイドの即時更新が必要ならuseSearchParams hookをクライアントコンポーネントで使いましょう。</p>
+        </div>
+      </div>
+    </section>
+    
+    <div class="chalk-divider"></div>
+    
+    <section>
+      <h2 class="section-title chalk-text">⏳ ローディングとサスペンス</h2>
+      
+      <div class="grid">
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">22</span> ローディング状態を考慮しない</h3>
+          <p class="problem">ローカル環境では高速なため、本番でのローディング時間を軽視してしまいます。</p>
+          <p class="solution">loading.tsxファイルを使って、ページローディング中のUI表示を定義しましょう。</p>
+        </div>
+        
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">23</span> Suspenseの境界が粗すぎる</h3>
+          <p class="problem">ページ全体をloading.tsxでラップすると、一部のデータ取得が遅いだけでページ全体がブロックされます。</p>
+          <p class="solution">データフェッチをする特定のコンポーネントだけをSuspenseでラップして、他の部分は即時表示できるようにしましょう。</p>
+        </div>
+      </div>
+      
+      <div class="grid">
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">24</span> Suspenseを間違った場所に配置</h3>
+          <p class="problem">Suspenseコンポーネントを非同期処理（await）よりも下位に配置すると、想定通り動作しません。</p>
+          <p class="solution">Suspenseは非同期処理を行うコンポーネントの親またはそれより上位に配置しましょう。</p>
+        </div>
+        
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">25</span> Suspenseのkey propを忘れる</h3>
+          <p class="problem">Suspenseでラップされたコンポーネントがサーチパラメータなどの変更で再フェッチする必要がある場合、key propがないと再トリガーされません。</p>
+          <p class="solution">パラメータ変更時にSuspenseを再トリガーするには、変更する値をkey propに指定しましょう（例：&lt;Suspense key={searchParams.id}&gt;）。</p>
+        </div>
+      </div>
+    </section>
+    
+    <div class="chalk-divider"></div>
+    
+    <section>
+      <h2 class="section-title chalk-text">🔒 レンダリングとセキュリティ</h2>
+      
+      <div class="grid">
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">26</span> 意図せずDynamic Renderingにしてしまう</h3>
+          <p class="problem">searchParams、cookies、headersなどのAPIを使うと、ルートが自動的にStatic RenderingからDynamic Renderingに切り替わり、パフォーマンスが低下します。</p>
+          <p class="solution">可能な限りStatic Renderingを維持し、動的APIの使用は必要最小限に。認証チェックはMiddlewareで行うことも検討しましょう。</p>
+        </div>
+        
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">27</span> シークレットをハードコードする</h3>
+          <p class="problem">APIキーなどの機密情報をコンポーネントファイル内に直接記述すると、クライアントコンポーネントとして使用された際に漏洩します。</p>
+          <p class="solution">シークレットは環境変数として管理し、process.env.SECRET_KEYとしてアクセス。クライアント公開が必要な場合のみNEXT_PUBLIC_接頭辞を使用。</p>
+        </div>
+      </div>
+      
+      <div class="grid">
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">28</span> クライアント/サーバーユーティリティの区別不足</h3>
+          <p class="problem">環境変数を使用するユーティリティ関数がクライアントコンポーネントでも使用されると、予期せぬ動作の原因になります。</p>
+          <p class="solution">server-onlyパッケージを使って、サーバー専用のユーティリティを明示しましょう。ファイル名もserverUtils.tsのように明確に。</p>
+        </div>
+        
+        <div class="mistake-card">
+          <h3 class="mistake-title"><span class="mistake-number">29</span> redirect関数をtry/catch内で使用</h3>
+          <p class="problem">next/navigationのredirect関数はエラーをスローするため、try/catch内で使うと正しくリダイレクトされません。</p>
+          <p class="solution">redirect関数はtry/catchブロックの外側で使用しましょう。サードパーティ認証ライブラリでも同様の問題が発生する可能性があります。</p>
+        </div>
+      </div>
+    </section>
+    
+    <div class="chalk-divider"></div>
+    
+    <section>
+      <h2 class="section-title chalk-text">📝 まとめ</h2>
+      <div class="chalk-box">
+        <p class="chalk-text">Next.js App Routerは強力ですが、新しいパラダイムの理解には学習曲線があります。これらのよくあるミスを避けることで、より効率的で堅牢なアプリケーションを構築できるでしょう。</p>
+        <p class="chalk-text">開発を続ける中で、これらのパターンに気をつけながら、適切に対処していきましょう。</p>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
