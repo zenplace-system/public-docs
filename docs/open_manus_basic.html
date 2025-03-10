@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenManus初心者向けグラフィックレコーディング</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kaisei+Decol&family=Yomogi&family=Zen+Kurenaido&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary: #2E578C;
+            --color-secondary: #182D40;
+            --color-accent: #BF807A;
+            --color-dark: #592A2A;
+            --color-light: #F2F2F2;
+        }
+        
+        body {
+            font-family: 'Zen Kurenaido', sans-serif;
+            background-color: var(--color-light);
+            margin: 0;
+            padding: 0;
+            color: #334155;
+            line-height: 1.4;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px dotted var(--color-primary);
+            position: relative;
+        }
+        
+        .title-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .title {
+            font-family: 'Kaisei Decol', serif;
+            font-size: 32px;
+            font-weight: bold;
+            margin: 0;
+            background: linear-gradient(45deg, var(--color-primary), var(--color-accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            animation: titleGlow 3s infinite alternate;
+            padding: 0 15px;
+        }
+        
+        @keyframes titleGlow {
+            0% {
+                text-shadow: 0 0 10px rgba(46, 87, 140, 0.2);
+            }
+            100% {
+                text-shadow: 0 0 20px rgba(191, 128, 122, 0.4);
+            }
+        }
+        
+        .date {
+            font-family: 'Yomogi', cursive;
+            font-size: 14px;
+            color: var(--color-dark);
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 60px;
+            height: 60px;
+            background-color: var(--color-primary);
+            opacity: 0.1;
+            border-radius: 0 0 0 60px;
+            z-index: 0;
+        }
+        
+        .section-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            color: var(--color-primary);
+            z-index: 1;
+        }
+        
+        .section-title {
+            font-family: 'Kaisei Decol', serif;
+            color: #1e40af;
+            font-size: 18px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px dashed var(--color-primary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+        }
+        
+        .keyword {
+            font-weight: bold;
+            border-bottom: 2px solid var(--color-accent);
+            display: inline-flex;
+            align-items: center;
+            padding: 0 2px;
+        }
+        
+        .keyword i {
+            margin-right: 5px;
+            font-size: 0.9em;
+        }
+        
+        .arrow-container {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+        }
+        
+        .arrow {
+            color: var(--color-primary);
+            font-size: 24px;
+            position: relative;
+        }
+        
+        .arrow::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -50px;
+            right: -50px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+            z-index: -1;
+        }
+        
+        .highlight {
+            background: linear-gradient(transparent 50%, rgba(191, 128, 122, 0.3) 50%);
+            padding: 0 2px;
+        }
+        
+        .note {
+            background-color: rgba(46, 87, 140, 0.1);
+            border-left: 3px solid var(--color-primary);
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+            position: relative;
+        }
+        
+        .note::before {
+            content: '\f0eb';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            background-color: white;
+            color: var(--color-primary);
+            padding: 5px;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin: 10px 0;
+        }
+        
+        .step-number {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 25px;
+            height: 25px;
+            background-color: var(--color-primary);
+            color: white;
+            border-radius: 50%;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            flex-grow: 1;
+        }
+        
+        .command {
+            background-color: #1e293b;
+            color: #f8fafc;
+            font-family: monospace;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            position: relative;
+            overflow-x: auto;
+        }
+        
+        .command::before {
+            content: 'Terminal';
+            position: absolute;
+            top: -8px;
+            left: 10px;
+            background-color: var(--color-primary);
+            color: white;
+            padding: 0 5px;
+            font-size: 10px;
+            border-radius: 3px;
+        }
+        
+        .tool-icon {
+            font-size: 28px;
+            margin-right: 10px;
+            color: var(--color-primary);
+        }
+        
+        .feature-list {
+            padding-left: 25px;
+        }
+        
+        .feature-item {
+            margin-bottom: 8px;
+            position: relative;
+            list-style-type: none;
+        }
+        
+        .feature-item::before {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: var(--color-primary);
+            position: absolute;
+            left: -25px;
+            top: 2px;
+        }
+        
+        .box-highlight {
+            background-color: rgba(46, 87, 140, 0.05);
+            border: 1px dashed var(--color-primary);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .box-highlight-title {
+            font-family: 'Kaisei Decol', serif;
+            color: var(--color-primary);
+            margin-top: -25px;
+            margin-bottom: 10px;
+            background-color: white;
+            display: inline-block;
+            padding: 0 10px;
+        }
+        
+        .code-example {
+            background-color: #1e293b;
+            color: #f8fafc;
+            font-family: monospace;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            position: relative;
+            overflow-x: auto;
+        }
+        
+        .code-example::before {
+            content: 'Python';
+            position: absolute;
+            top: -8px;
+            left: 10px;
+            background-color: var(--color-accent);
+            color: white;
+            padding: 0 5px;
+            font-size: 10px;
+            border-radius: 3px;
+        }
+        
+        .workflow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        .workflow-step {
+            background-color: white;
+            border: 2px solid var(--color-primary);
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            position: relative;
+            text-align: center;
+            width: 80%;
+        }
+        
+        .workflow-step::after {
+            content: '\f063';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: var(--color-primary);
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--color-light);
+            width: 25px;
+            height: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            animation: bounceArrow 2s infinite;
+        }
+        
+        .workflow-step:last-child::after {
+            display: none;
+        }
+        
+        @keyframes bounceArrow {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                transform: translateX(-50%) translateY(5px);
+            }
+        }
+        
+        .icon-large {
+            font-size: 2em;
+            margin: 10px;
+            color: var(--color-primary);
+        }
+        
+        .icon-large.accent {
+            color: var(--color-accent);
+        }
+        
+        .icon-large.dark {
+            color: var(--color-dark);
+        }
+        
+        .background-pattern {
+            position: absolute;
+            font-size: 200px;
+            color: var(--color-primary);
+            opacity: 0.03;
+            z-index: -1;
+        }
+        
+        .pattern-1 {
+            top: 10%;
+            left: 5%;
+        }
+        
+        .pattern-2 {
+            bottom: 20%;
+            right: 5%;
+            transform: rotate(25deg);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 3px dotted var(--color-primary);
+            color: var(--color-secondary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        /* レスポンシブデザイン */
+        @media (max-width: 1024px) {
+            .grid-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .date {
+                margin-top: 10px;
+            }
+        }
+        
+        /* アニメーション効果 */
+        .fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .scale-in {
+            animation: scaleIn 0.5s ease-out;
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* ホバーエフェクト */
+        .hover-effect {
+            transition: transform 0.3s, color 0.3s;
+        }
+        
+        .hover-effect:hover {
+            transform: scale(1.1);
+            color: var(--color-accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 背景パターン -->
+        <div class="background-pattern pattern-1">
+            <i class="fas fa-robot"></i>
+        </div>
+        <div class="background-pattern pattern-2">
+            <i class="fas fa-microchip"></i>
+        </div>
+        
+        <!-- ヘッダー -->
+        <div class="header fade-in">
+            <div class="title-container">
+                <i class="fas fa-robot fa-2x" style="color: var(--color-primary);"></i>
+                <h1 class="title">OpenManus初心者向けガイド</h1>
+                <i class="fas fa-cogs fa-2x fa-spin" style="color: var(--color-accent);"></i>
+            </div>
+            <div class="date">
+                <i class="fas fa-calendar-alt"></i> 2025年3月作成
+            </div>
+        </div>
+        
+        <!-- グリッドレイアウト -->
+        <div class="grid-container">
+            <!-- セクション1: OpenManusの概要 -->
+            <div class="card scale-in">
+                <i class="fas fa-info-circle section-icon fa-beat-fade"></i>
+                <h2 class="section-title">
+                    <i class="fas fa-star-half-alt fa-lg"></i> OpenManusの概要
+                </h2>
+                <p>
+                    <span class="keyword"><i class="fas fa-rocket"></i>OpenManus</span>は、招待制AIエージェント「Manus」（Monica氏開発）の能力を
+                    <span class="highlight">オープンソースで再現</span>するプロジェクトです。
+                </p>
+                <div style="text-align: center;">
+                    <i class="fas fa-robot icon-large fa-bounce"></i>
+                    <i class="fas fa-plus icon-large"></i>
+                    <i class="fas fa-code-branch icon-large accent"></i>
+                </div>
+                <p>
+                    <span class="keyword"><i class="fas fa-magic"></i>特徴</span>：
+                    複数エージェントが協調して<span class="highlight">自律的に複雑なタスクを実行</span>できます。
+                </p>
+                
+                <div class="box-highlight">
+                    <div class="box-highlight-title">
+                        <i class="fas fa-lightbulb"></i> 主な機能
+                    </div>
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <span class="keyword"><i class="fas fa-users"></i>マルチエージェント</span>：
+                            複数AIが連携してタスク実行
+                        </li>
+                        <li class="feature-item">
+                            <span class="keyword"><i class="fas fa-tasks"></i>タスク自動実行</span>：
+                            旅行計画や分析を自動化
+                        </li>
+                        <li class="feature-item">
+                            <span class="keyword"><i class="fas fa-plug"></i>ツール統合</span>：
+                            Web検索やコード実行など
+                        </li>
+                        <li class="feature-item">
+                            <span class="keyword"><i class="fab fa-docker"></i>Docker対応</span>：
+                            コンテナ環境で簡単実行
+                        </li>
+                        <li class="feature-item">
+                            <span class="keyword"><i class="fas fa-expand-alt"></i>拡張可能設計</span>：
+                            モジュール形式で機能追加可能
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="note">
+                    <p>
+                        <span class="keyword"><i class="fas fa-building"></i>企業応用例</span>：
+                        データ分析レポートの自動生成、
+                        大量ログからのインサイト抽出、
+                        チケット対応の自動化など
+                    </p>
+                </div>
+            </div>
+            
+            <!-- セクション2: Macローカル環境でのセットアップ -->
+            <div class="card scale-in" style="animation-delay: 0.2s;">
+                <i class="fab fa-apple section-icon"></i>
+                <h2 class="section-title">
+                    <i class="fas fa-laptop-code fa-lg fa-beat"></i> Macローカル環境セットアップ
+                </h2>
+                
+                <div class="box-highlight">
+                    <div class="box-highlight-title">
+                        <i class="fas fa-clipboard-check"></i> 必要な環境
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; justify-content: space-around;">
+                        <div style="text-align: center; margin: 5px;">
+                            <i class="fab fa-docker icon-large hover-effect"></i>
+                            <div>Docker 20.10+</div>
+                        </div>
+                        <div style="text-align: center; margin: 5px;">
+                            <i class="fas fa-layer-group icon-large hover-effect"></i>
+                            <div>Docker Compose 1.29+</div>
+                        </div>
+                        <div style="text-align: center; margin: 5px;">
+                            <i class="fab fa-python icon-large hover-effect"></i>
+                            <div>Python 3.9+</div>
+                        </div>
+                        <div style="text-align: center; margin: 5px;">
+                            <i class="fab fa-node-js icon-large hover-effect"></i>
+                            <div>Node.js 16+</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3 style="color: var(--color-primary);">
+                    <i class="fas fa-cogs"></i> インストール手順
+                </h3>
+                
+                <div class="workflow">
+                    <div class="workflow-step">
+                        <i class="fab fa-git-alt fa-2x" style="color: var(--color-accent);"></i>
+                        <p><span class="highlight">リポジトリをクローン</span></p>
+                        <div class="command">
+                            git clone https://github.com/henryalps/OpenManus.git<br>
+                            cd OpenManus
+                        </div>
+                    </div>
+                    <div class="workflow-step">
+                        <i class="fas fa-file-code fa-2x" style="color: var(--color-accent);"></i>
+                        <p><span class="highlight">設定ファイルを用意</span></p>
+                        <div class="command">
+                            cp config/config.example.toml config/config.toml
+                        </div>
+                        <p>エディタで<code>config.toml</code>を開き、APIキー等を設定</p>
+                    </div>
+                    <div class="workflow-step">
+                        <i class="fas fa-hammer fa-2x" style="color: var(--color-accent);"></i>
+                        <p><span class="highlight">Dockerイメージをビルド</span></p>
+                        <div class="command">
+                            docker-compose build
+                        </div>
+                    </div>
+                    <div class="workflow-step">
+                        <i class="fas fa-play fa-2x" style="color: var(--color-accent);"></i>
+                        <p><span class="highlight">コンテナを起動</span></p>
+                        <div class="command">
+                            docker-compose up
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="note">
+                    <p>
+                        <i class="fas fa-info-circle fa-pulse"></i>
+                        正常に起動すると、APIサーバが<span class="highlight">ポート5000</span>で、
+                        WebインターフェースがオプションでポートAが<span class="highlight">ポート3000</span>で待機します。
+                    </p>
+                </div>
+            </div>
+            
+            <!-- セクション3: 基本的な動作確認 -->
+            <div class="card scale-in" style="animation-delay: 0.4s;">
+                <i class="fas fa-check-circle section-icon"></i>
+                <h2 class="section-title">
+                    <i class="fas fa-vial fa-lg fa-fade"></i> 基本的な動作確認手順
+                </h2>
+                
+                <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+                    <div style="text-align: center; margin: 0 10px;">
+                        <i class="fas fa-terminal icon-large hover-effect"></i>
+                        <p>CLI確認</p>
+                    </div>
+                    <div style="text-align: center; margin: 0 10px;">
+                        <i class="fas fa-server icon-large hover-effect accent"></i>
+                        <p>API確認</p>
+                    </div>
+                </div>
+                
+                <div class="box-highlight">
+                    <div class="box-highlight-title">
+                        <i class="fas fa-terminal"></i> CLIによる対話
+                    </div>
+                    <p>別ターミナルを開き、リポジトリ直下で以下を実行：</p>
+                    <div class="command">
+                        python client.py --task "3日間の東京旅行の計画を立てて"
+                    </div>
+                    <p>
+                        <i class="fas fa-arrow-right"></i> エージェントが自律的に旅行計画を立案し結果を出力
+                    </p>
+                </div>
+                
+                <div class="box-highlight">
+                    <div class="box-highlight-title">
+                        <i class="fas fa-server"></i> REST APIによる確認
+                    </div>
+                    <p>コンテナ起動中に以下のコマンドで状態確認：</p>
+                    <div class="command">
+                        curl http://localhost:5000/status
+                    </div>
+                    <p>
+                        <i class="fas fa-arrow-right"></i> 正常動作時は <code>{"status":"running"}</code> を返却
+                    </p>
+                    
+                    <p>タスクを実行するには：</p>
+                    <div class="command">
+                        curl -X POST -H "Content-Type: application/json" \<br>
+                        &nbsp;&nbsp;-d '{ "task": "Hello, OpenManus!" }' \<br>
+                        &nbsp;&nbsp;http://localhost:5000/task
+                    </div>
+                    <p>
+                        <i class="fas fa-arrow-right"></i> JSONレスポンスでタスク実行結果が返却されます
+                    </p>
+                </div>
+            </div>
+            
+            <!-- セクション4: 業務に応用できるサンプル実装 -->
+            <div class="card scale-in" style="animation-delay: 0.6s;">
+                <i class="fas fa-briefcase section-icon"></i>
+                <h2 class="section-title">
+                    <i class="fas fa-chart-line fa-lg fa-flip"></i> 業務応用サンプル実装
+                </h2>
+                
+                <div class="box-highlight">
+                    <div class="box-highlight-title">
+                        <i class="fas fa-lightbulb"></i> ユースケース：売上データ分析レポート自動生成
+                    </div>
+                    <div style="text-align: center; margin: 15px 0;">
+                        <i class="fas fa-database icon-large"></i>
+                        <i class="fas fa-arrow-right fa-lg"></i>
+                        <i class="fas fa-chart-pie icon-large accent"></i>
+                        <i class="fas fa-arrow-right fa-lg"></i>
+                        <i class="fas fa-file-alt icon-large dark"></i>
+                    </div>
+                    
+                    <ol style="padding-left: 25px;">
+                        <li>
+                            <span class="highlight">データ収集</span>：
+                            <i class="fas fa-database fa-lg"></i>
+                            売上データを社内DBやAPIから取得
+                        </li>
+                        <li>
+                            <span class="highlight">データ分析</span>：
+                            <i class="fas fa-chart-bar fa-lg"></i>
+                            売上の傾向やパターンを分析
+                        </li>
+                        <li>
+                            <span class="highlight">レポート生成</span>：
+                            <i class="fas fa-file-alt fa-lg"></i>
+                            分析結果を要約したレポートを作成
+                        </li>
+                    </ol>
+                </div>
+                
+                <h3 style="color: var(--color-primary);">
+                    <i class="fas fa-code"></i> 実装サンプル
+                </h3>
+                
+                <div class="code-example">
+import requests<br>
+import json<br>
+<br>
+task = "当月の売上データを分析し、主要なトレンドと改善提案をまとめてください。"<br>
+response = requests.post("http://localhost:5000/task", json={"task": task})<br>
+<br>
+if response.status_code == 200:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;result = response.json().get("result")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;print("生成されたレポート:\n")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;print(result)<br>
+else:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;print(f"タスク実行リクエスト失敗: ステータスコード {response.status_code}")
+                </div>
+                
+                <div class="note">
+                    <p>
+                        <i class="fas fa-lightbulb fa-beat"></i>
+                        <span class="highlight">ポイント</span>：タスク指示は具体的に記述すると良い結果が得られます。
+                        社内データを使う場合は、エージェントにデータを渡す工夫が必要です。
+                    </p>
+                </div>
+            </div>
+            
+            <!-- セクション5: トラブルシューティング -->
+            <div class="card scale-in" style="animation-delay: 0.8s;">
+                <i class="fas fa-tools section-icon"></i>
+                <h2 class="section-title">
+                    <i class="fas fa-bug fa-lg fa-shake"></i> トラブルシューティング
+                </h2>
+                
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <p>
+                            <span class="keyword"><i class="fas fa-stop-circle"></i>Dockerコンテナ起動問題</span>：
+                            Dockerバージョン確認、Appleシリコン(M1/M2)の場合はエミュレーション有効化か
+                            <code>platform: linux/amd64</code>を指定
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <p>
+                            <span class="keyword"><i class="fas fa-random"></i>ポート競合</span>：
+                            <code>docker-compose.yml</code>内でポート番号変更（例：<code>5000:5000</code>→<code>5100:5000</code>）
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <p>
+                            <span class="keyword"><i class="fas fa-key"></i>APIキー関連エラー</span>：
+                            LLMや外部ツール用のAPIキー設定を確認。プロキシ環境ではネットワーク設定も確認
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <p>
+                            <span class="keyword"><i class="fas fa-exclamation-triangle"></i>結果の質の問題</span>：
+                            指示を具体的にする、タスクを段階的に実行するよう指示すると改善する場合があります
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="note">
+                    <p>
+                        <i class="fas fa-wrench fa-beat"></i>
+                        問題が解決しない場合は、GitHubのIssueページで類似の報告がないか確認し、
+                        必要に応じてIssueを投稿してください。
+                    </p>
+                </div>
+            </div>
+            
+            <!-- セクション6: 追加リソース -->
+            <div class="card scale-in" style="animation-delay: 1s;">
+                <i class="fas fa-book section-icon"></i>
+                <h2 class="section-title">
+                    <i class="fas fa-bookmark fa-lg fa-pulse"></i> 追加リソース
+                </h2>
+                
+                <div style="display: flex; justify-content: space-around; flex-wrap: wrap; margin: 20px 0;">
+                    <div style="text-align: center; margin: 10px;">
+                        <i class="fab fa-github icon-large hover-effect"></i>
+                        <p>GitHub<br>リポジトリ</p>
+                    </div>
+                    <div style="text-align: center; margin: 10px;">
+                        <i class="fas fa-blog icon-large hover-effect accent"></i>
+                        <p>公式ブログ<br>ドキュメント</p>
+                    </div>
+                    <div style="text-align: center; margin: 10px;">
+                        <i class="fab fa-discord icon-large hover-effect dark"></i>
+                        <p>コミュニティ<br>サポート</p>
+                    </div>
+                </div>
+                
+                <div class="box-highlight">
+                    <div class="box-highlight-title">
+                        <i class="fas fa-link"></i> 重要リンク
+                    </div>
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <span class="keyword"><i class="fab fa-github"></i>ソースコード</span>：
+                            <a href="https://github.com/henryalps/OpenManus" style="color: var(--color-primary);">
+                                GitHub - henryalps/OpenManus
+                            </a>
+                        </li>
+                        <li class="feature-item">
+                            <span class="keyword"><i class="fas fa-globe"></i>公式サイト</span>：
+                            <a href="https://openmanus.org" style="color: var(--color-primary);">
+                                OpenManus Online - AI Agent as a Service
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="note">
+                    <p>
+                        <i class="fas fa-lightbulb fa-beat"></i>
+                        <span class="highlight">まずはローカル環境で基本機能を試し</span>、シンプルなタスクから
+                        エージェントの動作を確認しましょう。慣れてきたら、社内の具体的な業務シナリオに
+                        適用し、生産性向上につなげてください。
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- フッター -->
+        <div class="footer fade-in">
+            <p>
+                <i class="fas fa-code"></i> OpenManusはオープンソースプロジェクトです。
+                フィードバックや貢献も歓迎されています。
+                <i class="fas fa-heart" style="color: var(--color-accent);"></i>
+            </p>
+            <div style="display: flex; align-items: center;">
+                <i class="fas fa-robot fa-2x" style="margin-right: 10px; color: var(--color-primary);"></i>
+                <p style="margin: 0;">一緒にAIエージェントの可能性を探求していきましょう！</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // スクロールに連動した要素の出現効果
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+            
+            cards.forEach(card => {
+                card.style.opacity = 0;
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                observer.observe(card);
+            });
+            
+            // ホバーエフェクト
+            const hoverElements = document.querySelectorAll('.hover-effect');
+            hoverElements.forEach(el => {
+                el.addEventListener('mouseenter', function() {
+                    this.style.color = 'var(--color-accent)';
+                    this.style.transform = 'scale(1.2)';
+                });
+                
+                el.addEventListener('mouseleave', function() {
+                    this.style.color = '';
+                    this.style.transform = '';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
